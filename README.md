@@ -40,3 +40,11 @@ A continuación se detallan las pruebas de los endpoints funcionando, demostrand
 ![Tareas Consola](capturas/03_tareas_b.png)
 *Renderizado final del panel de tareas en el navegador web local:*
 ![Tareas Navegador](capturas/03_tareas_c.png)
+
+## Respuestas Conceptuales
+
+**1. ¿Por qué es importante utilizar hashing para contraseñas en lugar de guardarlas en texto plano?**
+Básicamente, guardar contraseñas en texto plano es un peligro enorme para cualquier sistema. Si el día de mañana alguien nos hackea o se filtra la base de datos, los atacantes tendrían las claves reales de todos los usuarios servidas en bandeja. Al usar hashing (que en este TP lo implementé con la librería Werkzeug), lo que hacemos es transformar esa contraseña en un código cifrado que es irreversible. Así, si alguien logra entrar y robarse el archivo de la base de datos, solo va a ver una mezcla de letras y números sin sentido, manteniendo las cuentas de los usuarios totalmente protegidas.
+
+**2. ¿Qué ventajas ofrece SQLite frente a otros motores de bases de datos para este proyecto?**
+La mayor ventaja de SQLite para un TP de esta escala es la practicidad. Al ser una base de datos integrada y sin servidor, me ahorré el dolor de cabeza de tener que instalar, levantar y configurar un motor de base de datos pesado como MySQL o SQL Server en mi máquina. Toda la información del proyecto se guarda directamente en un único archivo local (tareas_db.sqlite) adentro de mi misma carpeta de trabajo. Esto hace que el proyecto sea súper liviano, muy fácil de probar localmente y, sobre todo, fácil de subir y compartir por GitHub sin que el profesor tenga que hacer configuraciones raras para correrlo.
