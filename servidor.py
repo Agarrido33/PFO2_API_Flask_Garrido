@@ -31,6 +31,7 @@ inicializar_bd()
 
 # --- ENDPOINTS DE LA API ---
 
+# Primer endpoint: Recibo el JSON con los datos del usuario nuevo, encripto su contraseña y lo guardo en la base.
 @app.route('/registro', methods=['POST'])
 def registrar_usuario():
     # Capturo los datos que llegan desde el cliente en formato JSON
@@ -64,6 +65,8 @@ def registrar_usuario():
         conexion.close()
         
     return jsonify(mensaje), codigo_estado
+
+# Segundo endpoint: Verifico que el usuario exista en la base y que la contraseña tipeada coincida con el hash guardado.
 @app.route('/login', methods=['POST'])
 def iniciar_sesion():
     # Capturo los datos que llegan desde el cliente
@@ -90,6 +93,39 @@ def iniciar_sesion():
     else:
         # Código 401 significa 'No Autorizado'
         return jsonify({"error": "Credenciales inválidas. Usuario o contraseña incorrectos."}), 401
+    
+
+# Tercer endpoint: Devuelvo el panel de tareas renderizado en formato HTML    
+@app.route('/tareas', methods=['GET'])
+def obtener_tareas():
+    # Armo una respuesta HTML muy sencilla directamente desde Flask
+    html_respuesta = """
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <title>Panel de Tareas</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f4f9; }
+            .contenedor { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+            h1 { color: #333; }
+        </style>
+    </head>
+    <body>
+        <div class="contenedor">
+            <h1>Tus Tareas Pendientes</h1>
+            <p>¡Bienvenido! Este es el HTML devuelto por tu API Flask.</p>
+            <ul>
+                <li>Tarea 1: Finalizar PFO 2 de Redes</li>
+                <li>Tarea 2: Entregar el trabajo en el campus</li>
+            </ul>
+        </div>
+    </body>
+    </html>
+    """
+    # Devuelvo el HTML y el código 200 de éxito
+    return html_respuesta, 200    
+
 # Configuro el puerto 5000 para escuchar las peticiones
 if __name__ == '__main__':
     print("Iniciando servidor API Flask en el puerto 5000...")
