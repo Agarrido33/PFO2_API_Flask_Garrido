@@ -64,6 +64,32 @@ def registrar_usuario():
         conexion.close()
         
     return jsonify(mensaje), codigo_estado
+@app.route('/login', methods=['POST'])
+def iniciar_sesion():
+    # Capturo los datos que llegan desde el cliente
+    datos = request.json
+    usuario = datos.get('usuario')
+    contrasena = datos.get('contraseña')
+    
+    if not usuario or not contrasena:
+        return jsonify({"error": "Faltan datos. Se requiere usuario y contraseña"}), 400
+        
+    # Me conecto a la base para buscar al usuario
+    conexion = sqlite3.connect(DB_NAME)
+    cursor = conexion.cursor()
+    
+    # Busco solamente la contraseña hasheada del usuario ingresado
+    cursor.execute('SELECT contrasena FROM usuarios WHERE usuario = ?', (usuario,))
+    resultado = cursor.fetchone()
+    conexion.close()
+    
+    # Validamos: ¿Existe el usuario? ¿La contraseña tipeada coincide con el hash guardado?
+    if resultado and check_password_hash(resultado[0], contrasena):
+        # Código 200 significa 'OK'
+        return jsonify({"mensaje": "Inicio de sesión exitoso. ¡Acceso concedido a las tareas!"}), 200
+    else:
+        # Código 401 significa 'No Autorizado'
+        return jsonify({"error": "Credenciales inválidas. Usuario o contraseña incorrectos."}), 401
 # Configuro el puerto 5000 para escuchar las peticiones
 if __name__ == '__main__':
     print("Iniciando servidor API Flask en el puerto 5000...")
