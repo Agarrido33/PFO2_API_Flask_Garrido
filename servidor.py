@@ -29,6 +29,41 @@ def inicializar_bd():
 # Ejecuto la función para asegurarme de que la BD esté lista antes de arrancar la API
 inicializar_bd()
 
+# --- ENDPOINTS DE LA API ---
+
+@app.route('/registro', methods=['POST'])
+def registrar_usuario():
+    # Capturo los datos que llegan desde el cliente en formato JSON
+    datos = request.json
+    usuario = datos.get('usuario')
+    contrasena = datos.get('contraseña')
+    
+    # Valido que no me manden campos vacíos
+    if not usuario or not contrasena:
+        return jsonify({"error": "Faltan datos. Se requiere usuario y contraseña"}), 400
+        
+    # Hasheo (encripto) la contraseña por seguridad usando werkzeug
+    contrasena_hasheada = generate_password_hash(contrasena)
+    
+    # Me conecto a la base para guardar el usuario
+    conexion = sqlite3.connect(DB_NAME)
+    cursor = conexion.cursor()
+    
+    try:
+        # Intento insertar el nuevo usuario en la tabla
+        cursor.execute('INSERT INTO usuarios (usuario, contrasena) VALUES (?, ?)', (usuario, contrasena_hasheada))
+        conexion.commit()
+        mensaje = {"mensaje": f"Usuario '{usuario}' registrado con éxito."}
+        codigo_estado = 201 # 201 significa 'Creado'
+    except sqlite3.IntegrityError:
+        # Si el usuario ya existe, la base salta porque le pusimos 'UNIQUE'
+        mensaje = {"error": f"El usuario '{usuario}' ya existe."}
+        codigo_estado = 409 # 409 significa 'Conflicto'
+    finally:
+        # Siempre cierro la conexión
+        conexion.close()
+        
+    return jsonify(mensaje), codigo_estado
 # Configuro el puerto 5000 para escuchar las peticiones
 if __name__ == '__main__':
     print("Iniciando servidor API Flask en el puerto 5000...")
